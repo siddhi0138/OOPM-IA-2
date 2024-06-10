@@ -1,0 +1,321 @@
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.*;
+ 
+class Details {
+    String name;
+    int age;
+    String aadharNo;
+    String phoneNo;
+    String emailId;
+    float balance;
+ 
+    Details(String name, int age, String aadharNo, String phoneNo, String emailId, float balance) {
+        this.name = name;
+        this.age = age;
+        this.aadharNo = aadharNo;
+        this.phoneNo = phoneNo;
+        this.emailId = emailId;
+        this.balance = balance;
+    }
+ 
+    void display() {
+        String format = "| %-15s | %-5d | %-12s | %-10s | %-20s | Rs%-10.2f |%n";
+        System.out.format(format, name, age, aadharNo, phoneNo, emailId, balance);
+    }
+}
+ 
+class Entry {
+    public static ArrayList<Details> accountList = new ArrayList<>();
+ 
+    public static void accountOpener() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Kindly enter your details to open an account:");
+ 
+        System.out.print("Name: ");
+        String name = scanner.nextLine();
+ 
+        System.out.print("Age: ");
+        int age = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character left in the buffer
+ 
+        System.out.print("Aadhar number (12 digits): ");
+        String aadharNo = scanner.nextLine();
+        while (aadharNo.length() != 12) {
+            System.out.println("Aadhar number must have exactly 12 digits. Please try again.");
+            aadharNo = scanner.nextLine();
+        }
+ 
+        System.out.print("Phone number (10 digits): ");
+        String phoneNo = scanner.nextLine();
+        while (phoneNo.length() != 10) {
+            System.out.println("Phone number must have exactly 10 digits. Please try again.");
+            phoneNo = scanner.nextLine();
+        }
+ 
+        System.out.print("Email ID: ");
+        String emailId = scanner.nextLine();
+ 
+        System.out.print("Initial balance for your account: Rs");
+        float balance = scanner.nextFloat();
+ 
+        System.out.println("Your account has been created.");
+ 
+        // Add the account details to the list
+        accountList.add(new Details(name, age, aadharNo, phoneNo, emailId, balance));
+    }
+}
+ 
+class ATM {
+    public static void atmServices(Details account) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("ATM Services for " + account.name + ":");
+            System.out.println("1. Deposit");
+            System.out.println("2. Withdraw");
+            System.out.println("3. Check Balance");
+            System.out.println("4. Exit to Main Menu");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+ 
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the amount to deposit: Rs");
+                    float depositAmount = scanner.nextFloat();
+                    account.balance += depositAmount;
+                    System.out.println("Deposited Rs" + depositAmount + ". Your new balance is: Rs" + account.balance);
+                    break;
+                case 2:
+                    System.out.print("Enter the amount to withdraw: Rs");
+                    float withdrawAmount = scanner.nextFloat();
+                    if (withdrawAmount <= account.balance) {
+                        account.balance -= withdrawAmount;
+                        System.out.println("Withdrawn Rs" + withdrawAmount + ". Your new balance is: Rs" + account.balance);
+                    } else {
+                        System.out.println("Insufficient balance.");
+                    }
+                    break;
+                case 3:
+                    System.out.println("Your balance is: Rs" + account.balance);
+                    break;
+                case 4:
+                    return; // Return to the main menu
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+ 
+class LoanCalculator {
+    private double loanAmount;
+    private double interestRate;
+    private int loanDurationMonths;
+ 
+    public LoanCalculator(double loanAmount) {
+        this.loanAmount = loanAmount;
+        generateRandomInterestRateAndDuration();
+    }
+ 
+    private void generateRandomInterestRateAndDuration() {
+        Random random = new Random();
+ 
+        // Generate a random interest rate between 5% and 15%.
+        interestRate = 5 + (random.nextDouble() * 10);
+ 
+        // Generate a random loan duration between 12 and 60 months.
+        loanDurationMonths = 12 + random.nextInt(49);
+    }
+ 
+    public double calculateEMI() {
+        // Monthly interest rate
+        double monthlyInterestRate = interestRate / 12 / 100;
+ 
+        // Number of monthly payments
+        int numberOfPayments = loanDurationMonths;
+ 
+        // Calculate EMI using the formula
+        double emi = loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments) /
+                (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
+ 
+        return emi;
+    }
+ 
+    public void displayLoanDetails() {
+        System.out.println("Loan Amount: Rs" + loanAmount);
+        System.out.println("Interest Rate: " + interestRate + "%");
+        System.out.println("Loan Duration: " + loanDurationMonths + " months");
+        System.out.println("Monthly EMI: Rs" + calculateEMI());
+    }
+}
+ 
+class LoanService {
+    public static void provideLoan() {
+        while (true) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter the loan amount: Rs");
+            double loanAmount = scanner.nextDouble();
+            scanner.close();
+ 
+            LoanCalculator loanCalculator = new LoanCalculator(loanAmount);
+            loanCalculator.displayLoanDetails();
+ 
+            System.out.print("Do you want to apply for another loan? (y/n): ");
+            scanner = new Scanner(System.in);
+            String anotherLoan = scanner.nextLine().trim().toLowerCase();
+            if (!anotherLoan.equals("y")) {
+                break; // Return to the main menu
+            }
+        }
+    }
+}
+ 
+class FDInterestCalculator {
+    private double depositAmount;
+    private double interestRate;
+ 
+    public FDInterestCalculator(double depositAmount) {
+        this.depositAmount = depositAmount;
+        generateRandomInterestRate();
+    }
+ 
+    private void generateRandomInterestRate() {
+        Random random = new Random();
+ 
+        // Generate a random interest rate between 4% and 8% for FD.
+        interestRate = 4 + (random.nextDouble() * 4);
+    }
+ 
+    public double calculateMaturityAmount(int months) {
+        // Calculate maturity amount using the formula
+        double maturityAmount = depositAmount * (1 + (interestRate / 100) * (months / 12));
+        return maturityAmount;
+    }
+ 
+    public void displayFDDetails() {
+        System.out.println("Fixed Deposit Amount: Rs" + depositAmount);
+        System.out.println("Interest Rate: " + interestRate + "%");
+        System.out.println("Maturity Amount after 1 year: Rs" + calculateMaturityAmount(12));
+        System.out.println("Maturity Amount after 5 years: Rs" + calculateMaturityAmount(60));
+    }
+}
+ 
+class FDService {
+    public static void createFD() {
+        while (true) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter the Fixed Deposit amount: Rs");
+            double fdAmount = scanner.nextDouble();
+            scanner.close();
+ 
+            FDInterestCalculator fdCalculator = new FDInterestCalculator(fdAmount);
+            fdCalculator.displayFDDetails();
+ 
+            System.out.print("Do you want to create another Fixed Deposit? (y/n): ");
+            scanner = new Scanner(System.in);
+            String anotherFD = scanner.nextLine().trim().toLowerCase();
+            if (!anotherFD.equals("y")) {
+                break; // Return to the main menu
+            }
+        }
+    }
+}
+ 
+
+public class CardService {
+    public static void createCard(Details account) {
+        Scanner scanner = new Scanner(System.in);
+        float minimumBalance = 100.0f; // Define your minimum balance requirement here
+ 
+        if (account.balance >= minimumBalance) {
+            System.out.println("You are eligible to create a new credit/debit card.");
+ 
+            // Simulate card creation process
+            System.out.println("Creating your new credit/debit card...");
+            System.out.println("Your card has been created successfully.");
+            System.out.println("Card details: ");
+            generateCardNumber(account.aadharNo);
+ 
+            // Return to the main menu
+        } else {
+            System.out.println("You do not have the minimum balance required to create a card.");
+            System.out.println("Please maintain a balance of at least Rs" + minimumBalance + " to be eligible.");
+            // Return to the main menu
+        }
+    }
+ 
+    private static void generateCardNumber(String aadharNo) {
+        Random random = new Random();
+        long cardNumber = 4000_0000_0000_0000L + random.nextLong();
+        System.out.println("Card Number: " + cardNumber);
+    }
+}
+ 
+ class Main2 {
+    public static void main(String[] args) {
+        Entry.accountOpener(); // Open an account
+        Scanner scanner = new Scanner(System.in);
+ 
+        while (true) {
+            System.out.println("Main Menu:");
+            System.out.println("1. ATM Services");
+            System.out.println("2. Apply for a Loan");
+            System.out.println("3. Create a Fixed Deposit");
+            System.out.println("4. Create a Credit/Debit Card");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+ 
+            switch (choice) {
+                case 1:
+                    if (Entry.accountList.size() > 0) {
+                        System.out.println("Select your account:");
+                        for (int i = 0; i < Entry.accountList.size(); i++) {
+                            System.out.println(i + 1 + ". " + Entry.accountList.get(i).name);
+                        }
+                        System.out.print("Enter the account number: ");
+                        int accountNumber = scanner.nextInt();
+                        if (accountNumber >= 1 && accountNumber <= Entry.accountList.size()) {
+                            ATM.atmServices(Entry.accountList.get(accountNumber - 1));
+                        } else {
+                            System.out.println("Invalid account number.");
+                        }
+                    } else {
+                        System.out.println("No accounts available. Please open an account first.");
+                    }
+                    break;
+                case 2:
+                    LoanService.provideLoan();
+                    break;
+                case 3:
+                    FDService.createFD();
+                    break;
+                case 4:
+                    if (Entry.accountList.size() > 0) {
+                        System.out.println("Select your account:");
+                        for (int i = 0; i < Entry.accountList.size(); i++) {
+                            System.out.println(i + 1 + ". " + Entry.accountList.get(i).name);
+                        }
+                        System.out.print("Enter the account number: ");
+                        int accountNumber = scanner.nextInt();
+                        if (accountNumber >= 1 && accountNumber <= Entry.accountList.size()) {
+                            CardService.createCard(Entry.accountList.get(accountNumber - 1));
+                        } else {
+                            System.out.println("Invalid account number.");
+                        }
+                    } else {
+                        System.out.println("No accounts available. Please open an account first.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Thank you for using our services.");
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
